@@ -4,10 +4,10 @@
 
 int countPairs1(int *arr, int len, int value) {
     int count = 0;
-    for (int i = 0; i < len; i++) {
-        for (int j = i + 1; j < len; j++) {
+    for (int i = 0; i < len; ++i) {
+        for (int j = i + 1; j < len; ++j) {
             if (arr[i] + arr[j] == value) {
-                count++;
+                ++count;
             }
         }
     }
@@ -18,36 +18,32 @@ int countPairs2(int *arr, int len, int value) {
     int count = 0;
     int left = 0;
     int right = len - 1;
-    
     while (left < right) {
         int sum = arr[left] + arr[right];
         if (sum == value) {
             if (arr[left] == arr[right]) {
-                // Если элементы одинаковые
                 int n = right - left + 1;
                 count += n * (n - 1) / 2;
                 break;
             } else {
-                // Подсчитываем количество одинаковых слева
-                int leftCount = 1;
-                while (left + 1 < right && arr[left] == arr[left + 1]) {
-                    leftCount++;
-                    left++;
+                int leftVal = arr[left];
+                int rightVal = arr[right];
+                int leftCount = 0;
+                while (left <= right && arr[left] == leftVal) {
+                    ++leftCount;
+                    ++left;
                 }
-                // Подсчитываем количество одинаковых справа
-                int rightCount = 1;
-                while (right - 1 > left && arr[right] == arr[right - 1]) {
-                    rightCount++;
-                    right--;
+                int rightCount = 0;
+                while (left <= right && arr[right] == rightVal) {
+                    ++rightCount;
+                    --right;
                 }
                 count += leftCount * rightCount;
-                left++;
-                right--;
             }
         } else if (sum < value) {
-            left++;
+            ++left;
         } else {
-            right--;
+            --right;
         }
     }
     return count;
@@ -55,13 +51,11 @@ int countPairs2(int *arr, int len, int value) {
 
 int countPairs3(int *arr, int len, int value) {
     int count = 0;
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; ++i) {
         int target = value - arr[i];
-        // Бинарный поиск первого вхождения target
         int left = i + 1;
         int right = len - 1;
         int first = -1;
-        
         while (left <= right) {
             int mid = left + (right - left) / 2;
             if (arr[mid] == target) {
@@ -73,13 +67,10 @@ int countPairs3(int *arr, int len, int value) {
                 right = mid - 1;
             }
         }
-        
         if (first != -1) {
-            // Находим последнее вхождение target
             left = first;
             right = len - 1;
             int last = first;
-            
             while (left <= right) {
                 int mid = left + (right - left) / 2;
                 if (arr[mid] == target) {
