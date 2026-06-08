@@ -1,56 +1,49 @@
 // Copyright 2021 NNTU-CS
-
-// Вспомогательная функция для бинарного поиска
-bool binarySearch(int* arr, int left, int right, int target) {
-    while (left <= right) {
-        int mid = left + (right - left) / 2;
-        if (arr[mid] == target) {
-            return true;
-        } else if (arr[mid] < target) {
-            left = mid + 1;
-        } else {
-            right = mid - 1;
-        }
-    }
-    return false;
-}
+#include "alg.h"
+#include <algorithm>
 
 int countPairs1(int *arr, int len, int value) {
     int count = 0;
-
     for (int i = 0; i < len; i++) {
-        for (int j = 0; j < len; j++) {
-            if (i != j && arr[i] + arr[j] == value && i < j) {
+        for (int j = i + 1; j < len; j++) {
+            if (arr[i] + arr[j] == value) {
                 count++;
             }
         }
     }
-
-    int result = 0;
-    for (int i = 0; i < len; i++) {
-        if (i > 0 && arr[i] == arr[i - 1]) continue;
-        for (int j = i + 1; j < len; j++) {
-            if (arr[i] + arr[j] == value) {
-                result++;
-                break;
-            }
-        }
-    }
-    return result;
+    return count;
 }
 
 int countPairs2(int *arr, int len, int value) {
     int count = 0;
     int left = 0;
     int right = len - 1;
+    
     while (left < right) {
         int sum = arr[left] + arr[right];
         if (sum == value) {
-            count++;
-            int currentLeft = arr[left];
-            while (left < right && arr[left] == currentLeft) left++;
-            int currentRight = arr[right];
-            while (left < right && arr[right] == currentRight) right--;
+            if (arr[left] == arr[right]) {
+                // Если элементы одинаковые
+                int n = right - left + 1;
+                count += n * (n - 1) / 2;
+                break;
+            } else {
+                // Подсчитываем количество одинаковых слева
+                int leftCount = 1;
+                while (left + 1 < right && arr[left] == arr[left + 1]) {
+                    leftCount++;
+                    left++;
+                }
+                // Подсчитываем количество одинаковых справа
+                int rightCount = 1;
+                while (right - 1 > left && arr[right] == arr[right - 1]) {
+                    rightCount++;
+                    right--;
+                }
+                count += leftCount * rightCount;
+                left++;
+                right--;
+            }
         } else if (sum < value) {
             left++;
         } else {
@@ -63,22 +56,42 @@ int countPairs2(int *arr, int len, int value) {
 int countPairs3(int *arr, int len, int value) {
     int count = 0;
     for (int i = 0; i < len; i++) {
-        if (i > 0 && arr[i] == arr[i - 1]) continue;
         int target = value - arr[i];
-        if (target < arr[i]) continue;
-
+        // Бинарный поиск первого вхождения target
         int left = i + 1;
         int right = len - 1;
+        int first = -1;
+        
         while (left <= right) {
             int mid = left + (right - left) / 2;
             if (arr[mid] == target) {
-                count++;
-                break;
+                first = mid;
+                right = mid - 1;
             } else if (arr[mid] < target) {
                 left = mid + 1;
             } else {
                 right = mid - 1;
             }
+        }
+        
+        if (first != -1) {
+            // Находим последнее вхождение target
+            left = first;
+            right = len - 1;
+            int last = first;
+            
+            while (left <= right) {
+                int mid = left + (right - left) / 2;
+                if (arr[mid] == target) {
+                    last = mid;
+                    left = mid + 1;
+                } else if (arr[mid] < target) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+            }
+            count += (last - first + 1);
         }
     }
     return count;
